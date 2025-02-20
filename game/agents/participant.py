@@ -23,6 +23,8 @@ from autogen_ext.models.openai import OpenAIChatCompletionClient
 import re
 import json
 
+_PARTICIPANT_MAX_RETRIES = 10
+
 
 class Participant(RoutedAgent):
     """
@@ -36,13 +38,13 @@ class Participant(RoutedAgent):
         self,
         description: str,
         model_client: OpenAIChatCompletionClient,
-        system_prompt: str,
+        system_prompt_template: str,
         inference_prompt_template: str,
     ):
         super().__init__(description)
         self._model_client = model_client
         self._model_context = BufferedChatCompletionContext(buffer_size=10)
-        self._system_prompts: list[LLMMessage] = [SystemMessage(content=system_prompt.format(role=self.id.key))]
+        self._system_prompts: list[LLMMessage] = [SystemMessage(content=system_prompt_template.format(role=self.id.key))]
         self._inference_prompt_template: str = inference_prompt_template
 
     @message_handler
@@ -52,7 +54,7 @@ class Participant(RoutedAgent):
         await self._model_context.add_message(UserMessage(content=message.content, source='manager'))
         # 调用LLM进行响应。
         response = ""
-        for i in range(10):
+        for i in range(_PARTICIPANT_MAX_RETRIES):
             # print(f"第{i}次尝试生成。")
             # 进行最多10次尝试，需要返回的结果是符合通讯协议的。
             response = await self.request_llm(message, context)
