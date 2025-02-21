@@ -15,9 +15,12 @@ from typing import List
 
 class GameRunner:
     def __init__(self, model_client: OpenAIChatCompletionClient):
-        self.runtime = SingleThreadedAgentRuntime()
+        self.runtime = self._init_runtime()
         self._model_client = model_client
         self._participant_ids = []
+
+    def _init_runtime(self):
+        return SingleThreadedAgentRuntime()
 
     async def register_agents(self, participant_ids: List[AgentId]):
         """
@@ -26,12 +29,16 @@ class GameRunner:
         await Manager.register(
             self.runtime,
             type='manager',
-            factory=lambda: Manager(participant_ids=participant_ids)
+            factory=lambda: Manager(
+                participant_ids=participant_ids
+            )
         )
         await Participant.register(
             self.runtime,
             type='participant',
-            factory=lambda: Participant('试验的参与者。', self._model_client)
+            factory=lambda: Participant(
+                '试验的参与者。', self._model_client
+            )
         )
 
     async def run_a_game(self, setting):
