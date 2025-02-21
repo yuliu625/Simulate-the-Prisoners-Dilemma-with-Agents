@@ -4,13 +4,13 @@
 这里，不需要基于LLM的manager，基于固定算法的设定会更可靠。
 """
 
-from game.protocols import GameSetting, ManagerRequest, ParticipantChoice
+from game.protocols import GameSetting, GameRequest, ManagerRequest, ParticipantChoice
 
 from autogen_core import (
     RoutedAgent,
     MessageContext,
     AgentId,
-    message_handler
+    message_handler,
 )
 
 import re
@@ -30,41 +30,62 @@ class Manager(RoutedAgent):
     def __init__(
         self,
         participant_ids: List[AgentId],
-        game_round: int = 10,
+        game_setting: dict,
     ):
         super().__init__('控制一场试验的管理者。')
-        self._game_round = game_round
+        self._game_setting = game_setting
         self._participant_ids = participant_ids
+        # 过去所有agent的对话。
         self._game_context = []
-        self._game_history = {}
+        # 解析对话后，模型JSON格式的想法。但这并不会给participant展示。
         self._game_thoughts = {}
+        # 解析和计算后，participant的选择和收益。
+        self._game_history = {}
 
     @message_handler
-    async def on_game_setting(self, message: GameSetting, context: MessageContext) -> None:
+    async def on_game_request(self, message: GameRequest, context: MessageContext) -> None:
         """设置试验，进行试验。"""
-        system_prompt_template = message.system_prompt_template
-        inference_prompt_template = message.inference_prompt_template
         # 进行多轮试验。
-        for game_round in range(self._game_round):
-            await self.run_a_round()
+        for game_round in range(1, message.game_round+1):
+            print(f"第{game_round}轮实验：")
+            await self.run_a_round(
+                game_round=game_round,
+                participant_message_template=message.participant_message_template,
+                history_prompt_template=message.history_prompt_template,
+            )
 
-    async def run_a_round(self, game_round: int, ) -> dict:
+    async def run_a_round(
+        self,
+        game_round: int,
+        participant_message_template: str,
+        history_prompt_template: str,
+    ) -> dict:
         """运行一轮实验。"""
         # 给每一个participant发送消息。
-        participant_choices = {}
+        participant_message_content = participant_message_template.format(game_round=game_round)
+        if game_round > 1:
+            history_prompt_content = history_prompt_template.format(choice_and_payoff_history=self._game_history)
+            participant_message_content = history_prompt_content + participant_message_content
+        # 记录所有participant的想法。
         participant_thoughts = {}
+        # 记录所有agent的选择。逐步记录，因为在所有agent完成选择之后才能计算结果。
+        participant_choices = {}
         for i, participant_id in enumerate(self._participant_ids):
-            participant_response: ParticipantChoice = await self.send_message_to_participant()
-            # 记录和解析结果。
+            participant_response: ParticipantChoice = await self.send_message_to_participant(
+                participant_message_content=participant_message_content,
+                participant_id=participant_id,
+            )
+            # 记录agent响应。
             self._game_context.append({f'{participant_id.key}': participant_response.content})
             # 记录participant的思考
             participant_thoughts[participant_id.key] = participant_response.result
-            # 记录participant的选择
-            participant_choices[participant_id.key] = participant_response.result['choice']
+            # 记录participant的选择。单独提取是为了计算。
+            participant_choices[participant_id.key] = {'choice': participant_response.result['choice']}
         # 当所有的participant完成选择，计算结果
-        round_result = self._calculate_profit(participant_choices)
+        round_result = self._calculate_payoff(participant_choices)
         # 记录结果。
-        self._game_history.append(round_result)
+        self._game_thoughts[f"{game_round}"] = participant_thoughts
+        self._game_history[f"{game_round}"] = round_result
         return round_result
 
     async def send_message_to_participant(self, participant_message_content: str, participant_id: AgentId) -> ParticipantChoice:
@@ -85,11 +106,18 @@ class Manager(RoutedAgent):
         matches = re.findall(pattern, response, re.DOTALL)
         if not matches:
             return None
-        raw_data_str: str = matches[0]
+        raw_data_str: str = matches[-1]
         return json.loads(raw_data_str)
 
-    def _calculate_profit(self, choice: dict) -> dict:
-        ...
+    def _calculate_payoff(self, participant_choices: dict) -> dict:
+        all_choice = ""
+        for participant_id, choice_dict in participant_choices.items():
+            all_choice += f"{choice_dict['choice']}_"
+        all_choice = all_choice[:-1]
+        payoff_list = self._game_setting['payoffs'][all_choice]
+        for i, (participant_id, choice_dict) in enumerate(participant_choices.items()):
+            participant_choices[participant_id]['payoff'] = payoff_list[i]
+        return participant_choices
 
 
 if __name__ == '__main__':
