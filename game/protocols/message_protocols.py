@@ -12,6 +12,13 @@ class GameSetting:
 
 
 @dataclass
+class GameRequest:
+    game_round: int
+    participant_message_template: str
+    history_prompt_template: str
+
+
+@dataclass
 class ManagerRequest:
     # system_prompt: str
     content: str
