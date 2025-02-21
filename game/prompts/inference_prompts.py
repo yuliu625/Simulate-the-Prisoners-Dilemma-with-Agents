@@ -35,11 +35,11 @@ inference_prompt_template = """\
 3. 你打算做出的选择，以及做出这个选择的原因。
 
 最后，你以JSON格式返回你的选择。
-```"""
+现在，开始逐步思考，然后做出你的选择。"""
 
 history_prompt_template = """\
 在过去，所有玩家的选择和收益是：
-{all_choice_and_profit}
+{choice_and_payoff_history}
 """
 
 
