@@ -4,6 +4,7 @@
 
 from .message_protocols import (
     GameSetting,
+    GameRequest,
     ManagerRequest,
     ParticipantChoice,
 )
