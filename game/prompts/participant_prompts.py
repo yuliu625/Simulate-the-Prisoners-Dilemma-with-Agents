@@ -17,7 +17,7 @@ def get_participant_system_prompt_template(
     participant_system_prompt: str = None,
     game_description: str = None,
     participant_description: str = None,
-    game_setting: dict = None,
+    game_rule: dict = None,
     response_format: str = None,
 ) -> str:
     participant_system_prompt = """\
@@ -30,7 +30,7 @@ def get_participant_system_prompt_template(
 {response_format}
 
 游戏的设置是：
-{game_setting}
+{game_rule}
 
 你需要一直记住你的身份是：
 """ if participant_system_prompt is None else participant_system_prompt
@@ -43,7 +43,7 @@ def get_participant_system_prompt_template(
 所有参与者都足够理性，并且追求自己最大的收益。\
 """ if participant_description is None else participant_description
 
-    game_setting = """\
+    game_rule = """\
 ```json
 {
   "players": ["player1", "player2"],
@@ -58,7 +58,7 @@ def get_participant_system_prompt_template(
     "背叛_背叛": [1, 1]
   }
 }
-```""" if game_setting is None else json_escape_braces(game_setting)
+```""" if game_rule is None else json_escape_braces(game_rule)
 
     response_format = """\
 你必须以markdown代码块包裹的JSON格式返回你的选择，例如：
@@ -83,7 +83,7 @@ def get_participant_system_prompt_template(
     result = participant_system_prompt.format(
         game_description=game_description,
         participants_description=participant_description,
-        game_setting=game_setting,
+        game_rule=game_rule,
         response_format=response_format,
     )
     result = escape_braces(result)
@@ -91,8 +91,12 @@ def get_participant_system_prompt_template(
 
 
 def get_participant_message_prompt_template(
-    game_round: int = None
+    participant_message_prompt_template: str = None
 ) -> str:
+    """
+    提供默认的template，
+    如果修改，需要保留{game_round}。
+    """
     participant_message_prompt_template = """\
 现在是第{game_round}轮试验。
 
@@ -103,17 +107,21 @@ def get_participant_message_prompt_template(
 
 最后，你以JSON格式返回你的选择。
 现在，开始逐步思考，然后做出你的选择。
-"""
+""" if participant_message_prompt_template is None else participant_message_prompt_template
     return participant_message_prompt_template
 
 
 def get_history_prompt_template(
-    choice_and_payoff_history: dict = None,
+    history_prompt_template: str = None,
 ) -> str:
+    """
+    提供默认的template，
+    如果修改，需要保留{choice_and_payoff_history}。
+    """
     history_prompt_template = """\
 在过去，所有玩家的选择和收益是：
 {choice_and_payoff_history}
-"""
+""" if history_prompt_template is None else history_prompt_template
     return history_prompt_template
 
 
