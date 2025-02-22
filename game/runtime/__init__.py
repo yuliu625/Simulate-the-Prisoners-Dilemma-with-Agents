@@ -2,8 +2,9 @@
 运行试验。
 """
 
-__all__ = []
+__all__ = [
+    'GameRunner'
+]
 
+from .game_runner import GameRunner
 
-if __name__ == '__main__':
-    pass
