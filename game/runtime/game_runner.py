@@ -3,7 +3,12 @@
 """
 
 from game.agents import Manager, Participant
-from game.protocols import GameSetting
+from game.protocols import GameRequest
+from game.prompts import (
+    get_participant_system_prompt_template,
+    get_history_prompt_template,
+    get_participant_message_prompt_template,
+)
 
 from autogen_core import SingleThreadedAgentRuntime
 from autogen_ext.models.openai import OpenAIChatCompletionClient
@@ -30,21 +35,27 @@ class GameRunner:
             self.runtime,
             type='manager',
             factory=lambda: Manager(
-                participant_ids=participant_ids
+                participant_ids=participant_ids,
+                game_rules={}
             )
         )
         await Participant.register(
             self.runtime,
             type='participant',
             factory=lambda: Participant(
-                '试验的参与者。', self._model_client
+                '试验的参与者。',
+                model_client=self._model_client,
+                system_prompt_template=get_participant_system_prompt_template()
             )
         )
 
     async def run_a_game(self, setting):
         self.runtime.start()
         await self.runtime.send_message(
+            message=GameRequest(
 
+            ),
+            recipient=AgentId()
         )
         await self.runtime.stop_when_idle()
 
