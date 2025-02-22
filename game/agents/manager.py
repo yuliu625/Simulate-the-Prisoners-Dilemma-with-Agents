@@ -4,7 +4,7 @@
 这里，不需要基于LLM的manager，基于固定算法的设定会更可靠。
 """
 
-from game.protocols import GameSetting, GameRequest, ManagerRequest, ParticipantChoice
+from game.protocols import GameRequest, ManagerRequest, ParticipantChoice
 
 from autogen_core import (
     RoutedAgent,
@@ -32,11 +32,11 @@ class Manager(RoutedAgent):
         self,
         description: str,
         participant_ids: List[AgentId],
-        game_rules: dict,  # 游戏规则，例如选择、payoff
+        game_rule: dict,  # 游戏规则，例如选择、payoff
         game_setting: dict,  # 为了保存游戏的设置
     ):
         super().__init__(description)
-        self._game_rules = game_rules
+        self._game_rule = game_rule
         self._game_setting = game_setting
         self._participant_ids = participant_ids
         # 过去所有agent的对话。
@@ -58,7 +58,7 @@ class Manager(RoutedAgent):
                 history_prompt_template=message.history_prompt_template,
             )
         # 完成实验之后保存设置和结果。
-        # self.save_result()
+        self.save_result(self._game_setting['dir_to_save'])
 
     async def run_a_round(
         self,
@@ -120,15 +120,17 @@ class Manager(RoutedAgent):
         for participant_id, choice_dict in participant_choices.items():
             all_choice += f"{choice_dict['choice']}_"
         all_choice = all_choice[:-1]
-        payoff_list = self._game_rules['payoffs'][all_choice]
+        payoff_list = self._game_rule['payoffs'][all_choice]
         for i, (participant_id, choice_dict) in enumerate(participant_choices.items()):
             participant_choices[participant_id]['payoff'] = payoff_list[i]
         return participant_choices
 
     def save_result(self, dir_to_save: str) -> None:
         dir_to_save = Path(dir_to_save)
+        with open(dir_to_save / 'game_setting.json', 'w', encoding='utf-8') as f:
+            json.dump(self._game_setting, f, ensure_ascii=False, indent=4)
         with open(dir_to_save / 'game_rules.json', 'w', encoding='utf-8') as f:
-            json.dump(self._game_rules, f, ensure_ascii=False, indent=4)
+            json.dump(self._game_rule, f, ensure_ascii=False, indent=4)
         with open(dir_to_save / 'game_context.json', 'w', encoding='utf-8') as f:
             json.dump(self._game_context, f, ensure_ascii=False, indent=4)
         with open(dir_to_save / 'game_thoughts.json', 'w', encoding='utf-8') as f:
