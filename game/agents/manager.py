@@ -15,6 +15,7 @@ from autogen_core import (
 
 import re
 import json
+from pathlib import Path
 
 from typing import List
 
@@ -29,10 +30,13 @@ class Manager(RoutedAgent):
     """
     def __init__(
         self,
+        description: str,
         participant_ids: List[AgentId],
-        game_setting: dict,
+        game_rules: dict,  # 游戏规则，例如选择、payoff
+        game_setting: dict,  # 为了保存游戏的设置
     ):
-        super().__init__('控制一场试验的管理者。')
+        super().__init__(description)
+        self._game_rules = game_rules
         self._game_setting = game_setting
         self._participant_ids = participant_ids
         # 过去所有agent的对话。
@@ -53,6 +57,8 @@ class Manager(RoutedAgent):
                 participant_message_template=message.participant_message_template,
                 history_prompt_template=message.history_prompt_template,
             )
+        # 完成实验之后保存设置和结果。
+        # self.save_result()
 
     async def run_a_round(
         self,
@@ -114,10 +120,21 @@ class Manager(RoutedAgent):
         for participant_id, choice_dict in participant_choices.items():
             all_choice += f"{choice_dict['choice']}_"
         all_choice = all_choice[:-1]
-        payoff_list = self._game_setting['payoffs'][all_choice]
+        payoff_list = self._game_rules['payoffs'][all_choice]
         for i, (participant_id, choice_dict) in enumerate(participant_choices.items()):
             participant_choices[participant_id]['payoff'] = payoff_list[i]
         return participant_choices
+
+    def save_result(self, dir_to_save: str) -> None:
+        dir_to_save = Path(dir_to_save)
+        with open(dir_to_save / 'game_rules.json', 'w', encoding='utf-8') as f:
+            json.dump(self._game_rules, f, ensure_ascii=False, indent=4)
+        with open(dir_to_save / 'game_context.json', 'w', encoding='utf-8') as f:
+            json.dump(self._game_context, f, ensure_ascii=False, indent=4)
+        with open(dir_to_save / 'game_thoughts.json', 'w', encoding='utf-8') as f:
+            json.dump(self._game_thoughts, f, ensure_ascii=False, indent=4)
+        with open(dir_to_save / 'game_history.json', 'w', encoding='utf-8') as f:
+            json.dump(self._game_history, f, ensure_ascii=False, indent=4)
 
 
 if __name__ == '__main__':
