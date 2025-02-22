@@ -6,6 +6,9 @@ from enum import Enum
 
 class QwenModelName(Enum):
     qwen_15 = 'qwen2.5-1.5b-instruct'
+    qwen_max = 'qwen-max'
+    qwen_plus = 'qwen-plus'
+    qwen_turbo = 'qwen-turbo'
 
 
 def get_qwen(model: str = 'qwen2.5-1.5b-instruct'):
