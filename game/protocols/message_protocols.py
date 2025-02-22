@@ -6,12 +6,6 @@ from dataclasses import dataclass
 
 
 @dataclass
-class GameSetting:
-    system_prompt_template: str
-    inference_prompt_template: str
-
-
-@dataclass
 class GameRequest:
     game_round: int
     participant_message_template: str
