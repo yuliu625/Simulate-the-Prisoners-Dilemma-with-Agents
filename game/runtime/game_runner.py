@@ -11,23 +11,22 @@ from game.prompts import (
 )
 
 from autogen_core import SingleThreadedAgentRuntime
-from autogen_ext.models.openai import OpenAIChatCompletionClient
 
 from autogen_core import AgentId
 
-from typing import List
-
 
 class GameRunner:
-    def __init__(self, model_client: OpenAIChatCompletionClient):
+    def __init__(self, manager_config: dict, participant_config: dict):
+        self._manager_config = manager_config
+        self._participant_config = participant_config
+
         self.runtime = self._init_runtime()
-        self._model_client = model_client
-        self._participant_ids = []
+        self._register_agents()
 
     def _init_runtime(self):
         return SingleThreadedAgentRuntime()
 
-    async def register_agents(self, participant_ids: List[AgentId]):
+    async def _register_agents(self):
         """
         注册相关的agent。
         """
@@ -35,27 +34,22 @@ class GameRunner:
             self.runtime,
             type='manager',
             factory=lambda: Manager(
-                participant_ids=participant_ids,
-                game_rules={}
+                **self._manager_config,
             )
         )
         await Participant.register(
             self.runtime,
             type='participant',
             factory=lambda: Participant(
-                '试验的参与者。',
-                model_client=self._model_client,
-                system_prompt_template=get_participant_system_prompt_template()
+                **self._participant_config,
             )
         )
 
-    async def run_a_game(self, setting):
+    async def run_a_game(self, game_request: GameRequest):
         self.runtime.start()
         await self.runtime.send_message(
-            message=GameRequest(
-
-            ),
-            recipient=AgentId()
+            message=game_request,
+            recipient=AgentId(type='manager', key='default')
         )
         await self.runtime.stop_when_idle()
 
