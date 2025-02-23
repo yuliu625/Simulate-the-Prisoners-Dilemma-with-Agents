@@ -127,6 +127,7 @@ class Manager(RoutedAgent):
 
     def save_result(self, dir_to_save: str) -> None:
         dir_to_save = Path(dir_to_save)
+        dir_to_save.mkdir(exist_ok=True, parents=True)
         with open(dir_to_save / 'game_setting.json', 'w', encoding='utf-8') as f:
             json.dump(self._game_setting, f, ensure_ascii=False, indent=4)
         with open(dir_to_save / 'game_rules.json', 'w', encoding='utf-8') as f:
