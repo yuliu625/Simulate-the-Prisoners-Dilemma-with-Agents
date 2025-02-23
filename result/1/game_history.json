@@ -1,0 +1,12 @@
+{
+    "1": {
+        "Player1": {
+            "choice": "合作",
+            "payoff": 3
+        },
+        "Player2": {
+            "choice": "合作",
+            "payoff": 3
+        }
+    }
+}
