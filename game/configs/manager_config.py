@@ -34,11 +34,14 @@ def get_manager_config() -> ManagerConfig:
         game_rule=dict(
             players=['Player1', 'Player2'],
             strategies=[
-                [],
-                [],
+                ["合作", "背叛"],
+                ["合作", "背叛"]
             ],
             payoffs={
-
+                "合作_合作": [3, 3],
+                "合作_背叛": [0, 5],
+                "背叛_合作": [5, 0],
+                "背叛_背叛": [1, 1]
             }
         ),
         game_setting=dict(
@@ -48,7 +51,7 @@ def get_manager_config() -> ManagerConfig:
                 participant_description=None,
                 response_format=None,
             ),
-            dir_to_save=r"",
+            dir_to_save=r"D:\document\code\deep_learning\Simulate-the-Prisoners-Dilemma-with-Agents\result/1",
         )
     )
 
