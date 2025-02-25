@@ -6,8 +6,16 @@
 
 from game.prompts import get_history_prompt_template, get_participant_message_prompt_template
 
+from typing import TypedDict
 
-def get_game_request():
+
+class GameRequest(TypedDict):
+    game_round: int
+    participant_message_template: str
+    history_prompt_template: str
+
+
+def get_game_request() -> GameRequest:
     return dict(
         game_round=1,
         participant_message_template=get_participant_message_prompt_template(
