@@ -16,7 +16,7 @@ class ParticipantConfig(TypedDict):
     system_prompt_template: str
 
 
-def get_participant_config():
+def get_participant_config() -> ParticipantConfig:
     return dict(
         description="一个实验的参与者",
         model_client=get_qwen(QwenModelName.qwen_15.value),
