@@ -12,8 +12,8 @@ The code can be run to perform a large number of simulation experiments with dif
 This is the root directory of the project. The other folders are documents and results.
 #### agents
 I define and build two agents. 
-- `participant` is a good enough implementation that this agent can simulate many participants of multiple experiments.
-- `manager` is the manager of the experiment and is responsible for running and calculating the experiment. For other experiments, `manager` need to rewrite some of the methods.
+- `Participant` is a good enough implementation that this agent can simulate many participants of multiple experiments.
+- `Manager` is the manager of the experiment and is responsible for running and calculating the experiment. For other experiments, `Manager` need to rewrite some of the methods.
 #### configs
 The configuration part of the project. 
 
@@ -22,15 +22,28 @@ For convenience, I do not have a configuration method designed for serialization
 All the prompt template are dynamically fetched, and modifying some of the templates can be done by modifying the kwargs of these methods. If no changes are made, these methods will generate the prompt template using default values.
 
 For model client, I provide qwen series model. It is still possible to customize the corresponding factory methods to use other models.
-
+#### prompts
+All files related to prompts. I write a lot of prompt template, but end up using the methods in the `participant_prompts.py`. These methods encapsulate the tedious string handling, and modifying these templates is dynamic.
+#### protocols
+Protocols for the communication between agents. I define protocols using `dataclass` in Python. It would be more rigorous to use `pydantic`. But since this is a small system, it is easier to use `dataclass`. (In part because changes to the protocols are easier to modify.)
+#### runtime
+The runtime of autogen. I build a simple runner that encapsulates the operations of the runtime object.
+#### subscriptions
+The subscription mechanism is important for autogen. But here, for sake of simplicity, the way used is to call the agents directly. In the future, for more complex cases, it will be necessary to add some functional agents.
+#### utils
+The main problems is that some of the f-string operations are done at agent runtime, so I provide these two methods.
+- Modify `{}` to make the f-string operation work.
+- Convert JSON data to string. Put it into a markdown code block. Modify to make the f-string operation work.
 ### some demo
 #### notebook demo
-
+Some examples run with jupyter notebook. My notes from testing at the time.
 #### result
-
+An example of results saved from a single run an experiment. The save directory is customizable.
 
 ## Shortcoming
-
+- Communication methods. I do not use the broadcast method because I need to make sure that the results are returned from each participant. This makes configuration a bit more difficult.
+- The configuration is somewhat complex. I want to build the project to be reusable enough from the start. However, there are some parts that don't need to be that complex. Otherwise, the configuration module requires building an additional system.
+- Logging. I implement my own logging and bind it to `manager`. However, `ClosureAgent` could be used here, or perhaps there are other better implementations.
 
 ## How to use
 
