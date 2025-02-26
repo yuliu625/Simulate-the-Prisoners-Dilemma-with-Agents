@@ -60,5 +60,13 @@ Without modification, all settings will be configured as default. All `kwargs` t
 ### 2. Run the experiment
 Run `run_a_game.py`. You can see the output of the run process in the terminal. The results of the experiment are stored in the directory specified in the previous step.
 
-## 
+## Summary
+Given sufficiently clear instructions, agents will exhibit a variety of behaviors similar to humans in prisoner's dilemma.
+
+Some interesting phenomena are:
+- Agents will consider strategy changes under multiple rounds of experiments.
+- Agents will exhibit a variety of complex strategies in behavioral economics.
+- Intelligent and creative agents will be more inclined to be uncooperative. But most agents are more inclined and try to cooperate in most cases. I think the reason for this phenomenon is that the post-training of the LLMs used here are intended to be used in conversations with humans, so they are trained to be more friendly.
+
+As a result, the agents do not make fully rational choices from the start. In many ways, agents behave like humans.
 
