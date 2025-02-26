@@ -46,7 +46,19 @@ An example of results saved from a single run an experiment. The save directory 
 - Logging. I implement my own logging and bind it to `manager`. However, `ClosureAgent` could be used here, or perhaps there are other better implementations.
 
 ## How to use
-
+### 1. Perform the configuration
+Set up the `_model_client.py`, `game_request.py`, `manager_config.py`, `participant_config.py` files in the `configs` package.
+- `_model_client.py`  
+  Other autogen supported model clients can be customized. Requires a custom factory method.
+- `game_request.py`  
+  Change the game settings. Mainly the number of round the experiment runs. It is also possible to massively change all relevant prompt templates.
+- `manager_config.py`  
+  Modify the game rule, the number of participants, the result storage path.
+- `participant_config.py`  
+  Change the underlying LLM of the participants, their identities, and the way they make inferences. 
+Without modification, all settings will be configured as default. All `kwargs` that are set to `None` by default can be customized.
+### 2. Run the experiment
+Run `run_a_game.py`. You can see the output of the run process in the terminal. The results of the experiment are stored in the directory specified in the previous step.
 
 ## 
 
