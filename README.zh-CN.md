@@ -62,5 +62,5 @@
 如果你对博弈论或者 LLM-based Agent 感兴趣，可以查看我的其他项目:
 - [Agent-Development-Toolkit](https://github.com/yuliu625/Yu-Agent-Development-Toolkit): 我构建的通用 Agent 开发相关工具。
 - [World-of-Six](https://github.com/yuliu625/World-of-Six): 一种复杂博弈论场景下 LLM-based Agent 行为的研究。这是我一篇被 **SWAIB[2025]** 接收的会议论文对应的仓库。
-- **暂未开源**: 我目前有一篇关于 LLM-based Agent 在具有网络效应的环境下的预期行为的研究，是工作论文。这篇期刊投中之后，对应的代码仓库也会开源。
+- **暂未开源**: 我目前有一篇关于 LLM-based Agent 在具有网络效应的环境下的预期行为的研究，是working paper。这篇期刊投中之后，对应的代码仓库也会开源。
 
