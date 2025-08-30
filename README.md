@@ -62,6 +62,6 @@ If you have any ideas or suggestions for this project, feel free to submit an Is
 ## Other Projects
 If you are interested in game theory or LLM-based agents, you can check out my other projects:
 - [Agent-Development-Toolkit](https://github.com/yuliu625/Yu-Agent-Development-Toolkit): A general toolkit I built for agent development.
-- [World-of-Six](https://github.com/yuliu625/World-of-Six): A study on the behavior of LLM-based agents in a complex game theory scenario. This is the repository for my conference paper accepted by SWAIB[2025].
+- [World-of-Six](https://github.com/yuliu625/World-of-Six): A study on the behavior of LLM-based agents in a complex game theory scenario. This is the repository for my conference paper accepted by **SWAIB[2025]**.
 - **Not yet open-sourced**: I currently have a working paper on the expected behavior of LLM-based agents in environments with network effects. The corresponding code repository will be open-sourced after the journal submission is accepted.
 
